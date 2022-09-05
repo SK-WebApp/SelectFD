@@ -1,7 +1,5 @@
 
 
-
-
 // set up global variable "data" which is the JSON database file 
 var data = { "foodtext":
 	[
@@ -76,7 +74,8 @@ var data = { "foodtext":
 			"ForkDripDescription": "drips slowly between the prongs of the fork", 
 			"SpoonTiltTest": "pours easily when tilted, not stick to the spoon", 
 			"ForkPressureTest": null,
-			"CommonFoodExample": "baby's first food like runny rice cereal or pureed fruit"
+			"CommonFoodExample_Drink": "baby's first food like runny rice cereal or pureed fruit",
+			"CommonFoodExample_Food": "baby's first food like runny rice cereal or pureed fruit"
 		},
 		{	
 			"IDDSILevel": "4", 
@@ -95,7 +94,8 @@ var data = { "foodtext":
 			"ForkDripDescription": "doesn't flow or drip continuously through prongs, can sit in a mound above fork", 
 			"SpoonTiltTest": "falls off easily when tilted, not stick to the spoon", 
 			"ForkPressureTest": "easily makes a clear pattern on the surface with fork with minimum pressure",
-			"CommonFoodExample": "thick cereal, pureed meat"
+			"CommonFoodExample_Drink": "thick cereal",
+			"CommonFoodExample_Food": "pureed meat"		
 		}, 
 		{	
 			"IDDSILevel": "5", 
@@ -204,8 +204,17 @@ var data = { "foodtext":
 // Gets the newArray and do a JSON parsing to get it in the right format. 	
 	var carriedArray = localStorage.getItem('newArray');
 //	console.log(carriedArray)
-	var newArray_c = JSON.parse(carriedArray); 
+
+/* putting this line inside the function of GetFilteredArray because it is causing problem with newArray initially being empty */
+// 	var newArray_c = JSON.parse(carriedArray); 
 //	console.log(newArray_c) 	
+
+
+// 	function GetCarry_NewArray () {
+// 		var carriedArray = localStorage.getItem('newArray');
+// 		var newArray_c = JSON.parse(carriedArray); 	
+// 	}
+// ___________________________---_______________
 
 // Setup a global variable called "currentLevel" (ie, the current level of selection on html page).
 	var currentLevel = []; 
@@ -216,7 +225,6 @@ var data = { "foodtext":
 			localStorage.setItem('newArray',JSON.stringify(filteredArray));	
 			console.log (newArray);
 	}
-
 
 // Sets up Global variables (htmlString1 and carriedString1)
 	var htmlString = "";
@@ -302,31 +310,43 @@ It names the value as the current newValue and stores it as the carriedValue */
  	
  		let id = document.getElementsByTagName("select")[0].id;
  		currentLevel = id; 
-
+ 		
 		 if (id == "level1") {
-			var level1Value = document.getElementById(currentLevel).value;
-			var filteredArray = foodtext.filter(ele => ele.Type.includes(level1Value));
-			UpdateSet_FArray (filteredArray);				
+			var level1Value = document.getElementById(currentLevel).value;	
+			if (level1Value != "Transitional") {
+				var filteredArray = foodtext.filter(ele => ele.Type.includes(level1Value));
+				UpdateSet_FArray (filteredArray);
+				clearError();
+				}
+			if (level1Value == "Transitional") {
+				renderHTMLerror(currentLevel);
+	
+				
+				clearComment();
+				}						
 			}	
 			
 		 if (id == "level2a") {
 			var level2Value = document.getElementById(currentLevel).value;
-			var filteredArray = newArray_c.filter(ele => ele.Modification == level2Value);
-			UpdateSet_FArray (filteredArray);		
-				
+			var newArray_c = JSON.parse(carriedArray); 
+			
 			if (level2Value == "Yes") {
+				var filteredArray = newArray_c.filter(ele => ele.Modification == level2Value);
+				UpdateSet_FArray (filteredArray);	
 				console.log(newArray)
 				clearComment();
 				clearError();
 				}
 			if (level2Value == "No") {		
+				newArray = newArray_c; 	
 				if (carriedUI2 == "Do Not Know") {
-					renderHTMLerror(currentLevel);
+// 					renderHTMLerror(currentLevel); // save this error for level 3c
 					clearComment();
 					}
 				if (carriedUI2 != "Do Not Know") {
-					renderHTMLcomment(currentLevel, newArray);
-					clearError();
+// 					renderHTMLcomment(currentLevel, newArray);
+// 					clearError();
+					clearComment();
 					}	
 				}	
 			}		
@@ -334,6 +354,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 		 if (id == "level2b") {
 			var level2Value = document.getElementById(currentLevel).value;
 			carriedDValue == ""
+			var newArray_c = JSON.parse(carriedArray); 
 			var filteredArray = newArray_c.filter(ele => ele.Modification == level2Value);			
 			UpdateSet_FArray (filteredArray);			
 			
@@ -355,6 +376,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 										
 		if (id == "level3a") {
 			var level3aValue = document.getElementById(currentLevel).value;
+			var newArray_c = JSON.parse(carriedArray); 
 			if (level3aValue == "Yes") {
 				var filteredArray = newArray_c.filter(ele => ele.TextureNumber.includes("one") && ele.TextureDescription.includes("smooth"));
 				UpdateSet_FArray (filteredArray);	
@@ -371,6 +393,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 
 		if (id == "level3b") {
 			var level3bValue = document.getElementById(currentLevel).value;	
+			var newArray_c = JSON.parse(carriedArray); 
 			if (level3bValue == "Yes") {
 				var filteredArray = newArray_c.filter(ele => ele.ChewingRequired == level3bValue || ele.BitingRequired == level3bValue);		 
 				}		
@@ -381,9 +404,39 @@ It names the value as the current newValue and stores it as the carriedValue */
 			renderHTMLerror(currentLevel, level3bValue);
 			clearComment();	
 			}
+
+		if (id == "level3c") {
+			var level3cValue = document.getElementById(currentLevel).value;	
+			var newArray_c = JSON.parse(carriedArray); 
+			if (level3cValue == "Yes") {
+				var filteredArray = newArray_c.filter(ele => ele.Modification == "No");
+				UpdateSet_FArray (filteredArray);	
+// 				console.log (filteredArray)
+// 				newArray = filteredArray; 
+// 			    localStorage.setItem('newArray',JSON.stringify(filteredArray));	
+// 			    console.log (newArray);
+			
+				if (carriedUI2 == "Do Not Know") {   // might need to duplicate this for food
+					renderHTMLerror(currentLevel);
+					clearComment();
+					}
+				if (carriedUI2 != "Do Not Know") {
+					renderHTMLcomment(currentLevel, newArray);
+					clearError();
+					}
+				}		
+			if (level3cValue == "No") {	
+				var filteredArray = newArray_c.filter(ele => ele.Modification == "Yes");
+				UpdateSet_FArray (filteredArray);	
+				console.log(newArray)
+				clearComment();
+				clearError();	
+				}	
+			}
 		
 		if (id == "level4a") {
 			var level4Value = document.getElementById(currentLevel).value;	
+			var newArray_c = JSON.parse(carriedArray); 
 			if (level4Value == "No") {
 				var filteredArray = newArray_c.filter(ele => ele.ChewingRequired == level4Value && ele.BitingRequired == level4Value);
 				UpdateSet_FArray (filteredArray);	
@@ -400,6 +453,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 
 		if (id == "level4b") {
 			var level4Value = document.getElementById(currentLevel).value;
+			var newArray_c = JSON.parse(carriedArray); 
 			var filteredArray = newArray_c.filter(ele => ele.TextureNumber.includes(level4Value));
 			UpdateSet_FArray (filteredArray);				
 			if (level4Value == "mixed") {
@@ -426,6 +480,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 			
 		 if (id == "level5a") {
 			var level5Value = document.getElementById(currentLevel).value;
+			var newArray_c = JSON.parse(carriedArray); 
 			var filteredArray = newArray_c.filter(ele => ele.ForkDripTest == level5Value);
 			UpdateSet_FArray (filteredArray);		
 			clearComment();
@@ -434,6 +489,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 			
 		 if (id == "level5b") {
 			var level5Value = document.getElementById(currentLevel).value;
+			var newArray_c = JSON.parse(carriedArray); 
 			var filteredArray = newArray_c.filter(ele => ele.BitingParticleSize.includes(level5Value));
 			UpdateSet_FArray (filteredArray);		
 			if (carriedUI3 == "Do Not Know") {
@@ -448,6 +504,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 			
 		 if (id == "level6a1") {
 			var level6a1Value = document.getElementById(currentLevel).value;
+			var newArray_c = JSON.parse(carriedArray); 
 			var filteredArray = newArray_c.filter(ele => ele.CommonFoodExample.includes(level6a1Value));
 			UpdateSet_FArray (filteredArray);	
 			if (carriedUI2 == "Do Not Know")	{
@@ -462,7 +519,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 							
 		 if (id == "level6a2") {
 			var level6a2Value = document.getElementById(currentLevel).value;
-				
+			var newArray_c = JSON.parse(carriedArray); 				
 			if (level6a2Value == "3" || level6a2Value == "4") {
 				var filteredArray = newArray_c.filter(ele => ele.IDDSILevel === level6a2Value);
 				UpdateSet_FArray (filteredArray);	
@@ -538,6 +595,9 @@ It names the value as the current newValue and stores it as the carriedValue */
 		if (newValue == "Yes" && currentLevel == "level2a") {
 			document.location.href = "index_FTApp_3a.html";
 		}
+		if (newValue == "No" && currentLevel == "level2a") {
+			document.location.href = "index_FTApp_3c.html";
+		}		
 		if (newValue == "Yes" && currentLevel == "level2b") {
 			document.location.href = "index_FTApp_3b.html";
 		}			
@@ -550,6 +610,9 @@ It names the value as the current newValue and stores it as the carriedValue */
 		if (newValue == "No" && currentLevel == "level3b") {
 			document.location.href = "index_FTApp_6a2.html";
 		}
+		if (newValue == "No" && currentLevel == "level3c") {
+			document.location.href = "index_FTApp_3a.html";
+		}	
 		if (newValue == "No" && currentLevel == "level4a") {
 			document.location.href = "index_FTApp_5a.html";
 		}	
@@ -623,21 +686,28 @@ It names the value as the current newValue and stores it as the carriedValue */
 		}
 		
 		if (currentLevel == "level2a" || currentLevel == "level2b") { 
-			htmlString1 += '<p>' + newValue + " to modification needed" + '.</p>';
+			htmlString1 += '<p>' + newValue + ", to modification needed" + '.</p>';
  			StoreString (htmlString1); 
 			htmlString += carriedString1 + htmlString1;	
 			StoreString_c (htmlString); 
 		}
 
 		if (currentLevel == "level3a") { 
-			htmlString1 += '<p>' + newValue + " to item being one texture, smooth and with no lumps" + '.</p>';	
+			htmlString1 += '<p>' + newValue + ", to item being one texture, smooth and with no lumps" + '.</p>';	
  			StoreString (htmlString1); 	
  			htmlString += carriedString1 + htmlString1;	
  			StoreString_c (htmlString); 
 		}	
 		
+		if (currentLevel == "level3c") { 
+			htmlString1 += '<p>' + newValue + ", to item flows like water" + '.</p>';	
+ 			StoreString (htmlString1); 	
+ 			htmlString += carriedString1 + htmlString1;	
+ 			StoreString_c (htmlString); 
+		}	
+
 		if (currentLevel == "level4a" || currentLevel == "level3b") { 
-			htmlString1 += '<p>' + newValue + " to requiring chewing and biting" + '.</p>';	
+			htmlString1 += '<p>' + newValue + ", to requiring chewing and biting" + '.</p>';	
  			StoreString (htmlString1); 	
  			htmlString += carriedString1 + htmlString1;	
  			StoreString_c (htmlString); 	
@@ -658,7 +728,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 		}					
 			
 		if (currentLevel == "level5a") { 
-			htmlString1 += '<p>' + newValue + " to thick enough to be picked up or stay on a fork" + '.</p>';	
+			htmlString1 += '<p>' + newValue + ", to thick enough to be picked up or stay on a fork" + '.</p>';	
 			StoreString (htmlString1); 	
 			htmlString += carriedString1 + htmlString1;	
 			StoreString_c (htmlString); 
@@ -737,7 +807,11 @@ It names the value as the current newValue and stores it as the carriedValue */
 //		document.getElementById("error-info").innerHTML = ""; 
 		var htmlString = ""; 
 
-     	if (currentLevel == "level2a" && carriedUI2 =="Do Not Know") { 
+		if (currentLevel == "level1" && newValue == "Transitional") {
+			htmlString += '<p>' + "Reminder - Transitional foods require higher level swallowing skills. It is especially important to consult your Speech-Language Pathologist directly regarding consumption of these types of food. <br> It is safe to assume that you will need skill levels equivalent to managing either <u>IDDSI Level 0, Thin (like water)</u> for Drinks or <u>IDDSI Level 7, Regular (no modifications needed)</u> for Foods. <br> If your recommended IDDSI Levels for Drinks and Foods do not match Level 0 Thin and Level 7 Regular, then it might not be safe to consume your item without modifications." +'</p>';
+			}	
+
+     	if (currentLevel == "level2a" && carriedUI2 == "Do Not Know") { 
      		var extractedLevel = newArray[0].IDDSILevel;
      		var extractedDes = newArray[0].Description;	
    			htmlString += '<p>' + "Based on your selection, your item <u>(" + carriedUI1 + ") is at IDDSI level " + extractedLevel + ", " + extractedDes + "</u>. Please double check with your clinician to see whether you are safe to consume items at this level, since you don't know your recommended IDDSI " + carriedDValue + " level (" + carriedUI2 + ")." +'</p>';
@@ -746,16 +820,25 @@ It names the value as the current newValue and stores it as the carriedValue */
      	if (currentLevel == "level2b" && carriedUI3 == "Do Not Know") { 
      		var extractedLevel = newArray[0].IDDSILevel;
      		var extractedDes = newArray[0].Description;	
-   			htmlString += '<p>' + "Based on your selection, your item (<u>" + carriedUI1 + ") is at IDDSI level " + extractedLevel + ", " + extractedDes + "</u>. Since you do don't know your recommended IDDSI food level (" + carriedUI3 + "), please double check with your clinician to see whether you are safe to consume items at this level." +'</p>';
+   			htmlString += '<p>' + "Your selection so far suggests you can handle food at <u>IDDSI level " + extractedLevel + ", " + extractedDes + "</u> and should be able to consume your item <u>(" + carriedUI1 + ")</u>. Since you don't know your recommended IDDSI food level (" + carriedUI3 + "), please double check with your clinician to confirm." +'</p>';
   			}	
   				
 		if (currentLevel == "level3a") {
-			htmlString += '<p>' + "Correction Needed - Please modify current item to be one smooth texture and with no lumps before continuing. One easy modification technique is to puree the item." +'</p>';
-			}
+			htmlString += '<p>' + "Correction Needed - To be considered a drink, please modify current item to be one smooth texture and with no lumps before continuing. One easy modification technique is to puree the item." +'</p>';
+			}	
 			
 		if (currentLevel == "level3b" && newValue == "No") {
 			htmlString += '<p>' + "Reminder - Please make sure current item is one smooth texture and with no lumps before continuing. One easy modification technique is to puree the item." +'</p>';
-			}			
+			}	
+// 		if (currentLevel == "level3b" && newValue == "Yes") {
+// 			htmlString += '<p>' + "Reminder - Please make sure current item is soft, moist and tender before continuing." +'</p>';
+// 			}	
+
+     	if (currentLevel == "level3c" && carriedUI2 == "Do Not Know") { 
+     		var extractedLevel = newArray[0].IDDSILevel;
+     		var extractedDes = newArray[0].Description;	
+   			htmlString += '<p>' + "Based on your selection, your item <u>(" + carriedUI1 + ") is at IDDSI level " + extractedLevel + ", " + extractedDes + "</u>. Please double check with your clinician to see whether you are safe to consume items at this level, since you don't know your recommended IDDSI " + carriedDValue + " level (" + carriedUI2 + ")." +'</p>';
+  			}				
 	
 		if (currentLevel == "level4a") {
 			htmlString += '<p>' + "Correction Needed - To be considered a drink, it requires no chewing and biting to be consumed. Please modify current item before continuing (i.e., use a food processor or blender)." +'</p>';
@@ -767,6 +850,10 @@ It names the value as the current newValue and stores it as the carriedValue */
    			htmlString += '<p>' + "Based on your selection, your item <u>(" + carriedUI1 + ") is at IDDSI level " + extractedLevel + ", " + extractedDes + "</u>. Since you don't know your recommended IDDSI food level (" + carriedUI3 + "), please double check with your clinician to see whether you are safe to consume items at this level" +'.</p>';
 			}
 			
+ 		if (currentLevel == "level4b" && newValue == "one" && carriedUI3 == "Do Not Know" ) {
+ 			htmlString += '<p>' + "Reminder - Please make sure current item is soft, moist and tender before continuing (i.e., some minimum chewing is required but not biting)" +'</p>';
+ 			}			
+					
 		if (currentLevel == "level5b" && carriedUI3 == "Do Not Know" ) {
      		var extractedLevel = newArray[0].IDDSILevel;
      		var extractedDes = newArray[0].Description;	
@@ -802,8 +889,8 @@ It names the value as the current newValue and stores it as the carriedValue */
 
 
 /* This sets up a function for displaying additional comment/instruction in the comment div. */
-	function renderHTMLcomment(currentLevel, newArray) {
-
+	function renderHTMLcomment(currentLevel) {
+		
 		var extractedLevel = newArray[0].IDDSILevel;  // This part is from function getLevel
  		console.log(extractedLevel)
  		var extractedDes = newArray[0].Description;	  // This part is from function getDescription
@@ -811,12 +898,12 @@ It names the value as the current newValue and stores it as the carriedValue */
  	    			
 		CommentContainer.innerHTML = "";
 //		document.getElementById("comment").innerHTML = ""; 
-		var htmlString = ""; 	
+		var htmlString = ""; 		
 		
 		if (carriedDFValue == "Drink" && carriedUI2 != "Do Not Know") {
 			var DlevelNumber = carriedUI2.match(/\d+/);
 			console.log(DlevelNumber[0])
-		
+				
 			if (currentLevel == "level2a" && extractedLevel >= DlevelNumber) {
 				htmlString += '<p>' + "Congratulations! You can consume your item." + "Your recommended <span> IDDSI drink level is " + carriedUI2 + "</span>, and your self-selected <u> IDDSI drink level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample + '.</p>';
 				}
@@ -826,21 +913,24 @@ It names the value as the current newValue and stores it as the carriedValue */
 			if (currentLevel == "level3a") {
 				htmlString += '<p>' + "Correction Needed: Please modify current item to be one smooth texture and with no lumps before continuing. One modification technique is to purred the item." +'</p>';
 				}
+			if (currentLevel == "level3c" && extractedLevel >= DlevelNumber) {
+				htmlString += '<p>' + "Congratulations! You can consume your item." + "Your recommended <span> IDDSI drink level is " + carriedUI2 + "</span>, and your self-selected <u> IDDSI drink level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample + '.</p>';
+				}
+			if (currentLevel == "level3c" && extractedLevel < DlevelNumber) { 			
+				htmlString += '<p>' + "Sorry, your item doesn't match recommendation. " + "Your recommended <span> IDDSI drink level is " + carriedUI2 + "</span>, but your self-selected <u> IDDSI drink level is " + extractedLevel + ", " + extractedDes + "</u>. You can modify your item by making it thicker" + '.</p>';
+				}
 			if (currentLevel == "level4a") {
 				htmlString += '<p>' + "Correction Needed: Please modify current item so it requires no chewing and biting to be consumed before continuing." +'</p>';
 				}					
-
 			if (currentLevel == "level6a1" && extractedLevel >= DlevelNumber) {
 				htmlString += '<p>' + "Congratulations! You can consume your item." + "Your recommended <span> IDDSI drink level is " + carriedUI2 + "</span>, and your self-selected <u> IDDSI drink level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample + '.</p>';
 				}
 			if (currentLevel == "level6a1" && extractedLevel < DlevelNumber) { 			
 				htmlString += '<p>' + "Sorry, your item doesn't match recommendation. " + "Your recommended <span> IDDSI drink level is " + carriedUI2 + "</span>, but your self-selected <u> IDDSI drink level is " + extractedLevel + ", " + extractedDes + "</u>. " + '</p>';
 				}
-
 			if (currentLevel == "level6a2" && extractedLevel >= DlevelNumber) {
-				htmlString += '<p>' + "Congratulations! You can consume your item. " + "Your recommended <span> IDDSI drink level is " + carriedUI2 + "</span>; and your self-selected <u> IDDSI drink level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample + '.</p>';
-				}
-				
+				htmlString += '<p>' + "Congratulations! You can consume your item. " + "Your recommended <span> IDDSI drink level is " + carriedUI2 + "</span>; and your self-selected <u> IDDSI drink level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample_Drink + '.</p>';
+				}				
 			if (currentLevel == "level6a2" && extractedLevel < DlevelNumber) { 			
 				htmlString += '<p>' + "Sorry, your item doesn't match recommendation. " + "Your recommended <span> IDDSI drink level is " + carriedUI2 + "</span>, but your self-selected <u> IDDSI drink level is " + extractedLevel + ", " + extractedDes + "</u>. " + '</p>';
 				}
@@ -859,7 +949,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 				htmlString += '<p>' + "Congratulations! You can consume your item. " + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, and your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample + '.</p>';		
 				}	
 			if (currentLevel == "level2b" && extractedLevel == FlevelNumber && extractedDes != FDes)	{
-				htmlString += '<p>' + "Sorry, your item doesn't match recommendation. " + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, but your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. Please modify your item so it's easier to process" + '.</p>';
+				htmlString += '<p>' + "Sorry, your item doesn't match recommendation. " + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, but your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. However, if your item has a naturally soft or tender texture and it is easy to chew, you might still be able to enjoy it. Otherwise, modify your item so it is easier to process." + '</p>';
 				}
 			if (currentLevel == "level2b" && extractedLevel > FlevelNumber) { 			
 				htmlString += '<p>' + "Sorry, your item doesn't match recommendation. " + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, but your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. Please modify your item so it's easier to process" + '.</p>';
@@ -871,7 +961,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 				htmlString += '<p>' + "Correction Needed: Please modify current item so it requires no chewing and biting to be consumed before continuing." +'</p>';
 				}
 			if (currentLevel == "level4b" && newValue == "one" ) {
-				htmlString += '<p>' + "Reminder: Based on your selection so far, foods at current IDDSI levels (5 and 6) would require chewing but no biting." +'</p>';
+				htmlString += '<p>' + "Reminder: Based on your selection so far, foods at current IDDSI levels would require chewing but no biting." +'</p>';
 				}
 			if (currentLevel == "level4b" && newValue == "mixed" && extractedLevel <= FlevelNumber) {
 				htmlString += '<p>' + "Congratulations! You can consume your item." + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, and your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample + '.</p>';
@@ -886,7 +976,7 @@ It names the value as the current newValue and stores it as the carriedValue */
 				htmlString += '<p>' + "Sorry, your item doesn't match recommendation. " + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, but your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. " + '.</p>';				
 				}
 			if (currentLevel == "level6a2" && extractedLevel <= FlevelNumber) {
-				htmlString += '<p>' + "Congratulations! You can consume your item. " + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, and your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample + '.</p>';
+				htmlString += '<p>' + "Congratulations! You can consume your item. " + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, and your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. " + "Examples of " + carriedDFValue + "s" + " at this level: " + newArray[0].CommonFoodExample_Food + '.</p>';
 				}
 			if (currentLevel == "level6a2" && extractedLevel > FlevelNumber) { 			
 				htmlString += '<p>' + "Sorry, your item doesn't match recommendation. " + "Your recommended <span> IDDSI food level is " + carriedUI3 + "</span>, but your self-selected <u> IDDSI food level is " + extractedLevel + ", " + extractedDes + "</u>. " + '.</p>';
@@ -939,7 +1029,8 @@ It names the value as the current newValue and stores it as the carriedValue */
 		document.getElementById('userinput2').innerHTML = " Your recommended IDDSI Drinks (Liquids) Level is:  <span>" + carriedUI2 + "</span>.";
 		document.getElementById('userinput3').innerHTML = " Your recommended IDDSI Foods (Solids) Level is:  <span>" + carriedUI3 + "</span>.";	
 	}
-
+	
+	/* This function displays the concatenated log of use selection choices at page load. */
 	function RetrieveString() {
 		document.getElementById('selection-info').innerHTML = carriedString1;
 	}
